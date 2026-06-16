@@ -927,11 +927,15 @@ class ilObjOpencastEventGUI extends ilObjectPluginGUI
     {
         // the api doesn't deliver a max count, so we fetch (limit + 1) to see if there should be a 'next' page
         try {
-            $common_idp = PluginConfig::getConfig(PluginConfig::F_COMMON_IDP);
+            $xoct_user = xoctUser::getInstance($this->dic->user());
+            $identifier = $xoct_user->getIdentifier();
+            if ($identifier === '') {
+                return [];
+            }
             $events = (array) $this->event_repository->getFiltered(
                 $filter,
-                $common_idp ? xoctUser::getInstance($this->dic->user())->getIdentifier() : '',
-                $common_idp ? [] : [xoctUser::getInstance($this->dic->user())->getUserRoleName()],
+                '',
+                [$xoct_user->getUserRoleName()],
                 $offset,
                 $limit + 1,
                 $sort
