@@ -795,11 +795,15 @@ class ilObjOpencastEventGUI extends ilObjectPluginGUI
     ): array {
         $events = [];
         try {
-            $common_idp = PluginConfig::getConfig(PluginConfig::F_COMMON_IDP);
-            $events = $this->event_repository->getFiltered(
+            $xoct_user = xoctUser::getInstance($this->dic->user());
+            $userid = $xoct_user->getIdentifier();
+            if ($userid === '') {
+                return [];
+            }
+            $events = (array) $this->event_repository->getFiltered(
                 $filter,
-                $common_idp ? xoctUser::getInstance($this->dic->user())->getIdentifier() : '',
-                $common_idp ? [] : [xoctUser::getInstance($this->dic->user())->getUserRoleName()],
+                '',
+                [$xoct_user->getUserRoleName()],
                 $offset,
                 $limit + $extra_limit,
                 $sort,
